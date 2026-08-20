@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UnifoLM-EWPred-1</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f7f8f5;
+      --paper: #ffffff;
+      --ink: #17212b;
+      --muted: #65717d;
+      --line: #d9ded7;
+      --line-strong: #bac4bd;
+      --red: #c43b3b;
+      --orange: #d97706;
+      --blue: #2563eb;
+      --green: #2f8f4e;
+      --shadow: 0 16px 48px rgba(23, 33, 43, 0.12);
+      --content-width: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #eef2ef 0, rgba(247, 248, 245, 0) 420px), var(--bg);
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.5;
+    }
+
+    button { font: inherit; }
+
+    a { color: inherit; }
+
+    .shell {
+      width: min(var(--content-width), calc(100% - 40px));
+      margin: 0 auto;
+      padding: 28px 0 64px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 18px;
+    }
+
+    .resample-btn {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--paper);
+      color: var(--ink);
+      font-weight: 850;
+      cursor: pointer;
+      transition: background 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+    }
+
+    .lang-switch {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: clamp(1rem, 1.7vw, 1.32rem);
+      font-weight: 750;
+    }
+
+    .lang-option {
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: #0969da;
+      font: inherit;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      cursor: pointer;
+    }
+
+    .lang-option.active {
+      color: var(--ink);
+      text-decoration-thickness: 3px;
+    }
+
+    .lang-separator {
+      color: #6b5b4f;
+      font-weight: 900;
+    }
+
+    .hero {
+      padding: 12px 0 46px;
+      border-bottom: 1px solid var(--line);
+      text-align: center;
+    }
+
+    .eyebrow {
+      display: block;
+      margin: 14px 0 0;
+      color: var(--ink);
+      font-size: clamp(1.35rem, 2.7vw, 2.35rem);
+      font-weight: 800;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    html[lang="en"] .eyebrow {
+      font-size: clamp(1rem, 1.9vw, 1.65rem);
+    }
+
+    h1 {
+      display: block;
+      margin: 0;
+      font-size: clamp(1.65rem, 3.4vw, 3rem);
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .title-line {
+      max-width: none;
+      margin: 0 auto;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+
+    .resource-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 9px;
+      margin-top: 30px;
+    }
+
+    .resource-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-width: 112px;
+      min-height: 44px;
+      padding: 0 18px;
+      border-radius: 999px;
+      background: #333333;
+      color: #fff;
+      font-size: clamp(0.9rem, 1.45vw, 1.12rem);
+      font-weight: 600;
+      text-decoration: none;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+      transition: transform 160ms ease, background 160ms ease, box-shadow 160ms ease;
+    }
+
+    .resource-pill:hover {
+      background: #202020;
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.18);
+      transform: translateY(-2px);
+    }
+
+    .resource-pill[aria-disabled="true"] {
+      cursor: default;
+    }
+
+    .resource-pill[aria-disabled="true"]:hover {
+      background: #333333;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+      transform: none;
+    }
+
+    .resource-icon {
+      display: inline-grid;
+      place-items: center;
+      width: 19px;
+      height: 19px;
+      font-size: 1rem;
+      line-height: 1;
+    }
+
+    .resource-icon svg {
+      width: 19px;
+      height: 19px;
+      fill: currentColor;
+    }
+
+    .resource-pill small {
+      font-size: 0.68em;
+      font-weight: 500;
+      opacity: 0.86;
+    }
+
+    .page-section {
+      border-bottom: 1px solid var(--line);
+      padding: 30px 0 34px;
+    }
+
+    .intro {
+      width: 100%;
+      margin: 30px auto 0;
+      color: #34414f;
+      font-size: clamp(1rem, 1.35vw, 1.14rem);
+      line-height: 1.68;
+      text-align: justify;
+      text-align-last: left;
+    }
+
+    .intro strong {
+      color: var(--ink);
+      font-weight: 850;
+    }
+
+    .section-intro {
+      width: 100%;
+      margin: 34px auto 18px;
+      color: #34414f;
+      font-size: clamp(1rem, 1.35vw, 1.14rem);
+      line-height: 1.68;
+      text-align: justify;
+      text-align-last: left;
+    }
+
+    .section-intro strong {
+      color: var(--ink);
+      font-weight: 850;
+    }
+
+    .ecosystem-note {
+      margin-top: 34px;
+    }
+
+    .rainbow-emphasis {
+      display: inline;
+      padding: 0 0.12em;
+      border-radius: 0.35em;
+      background: linear-gradient(90deg, #c43b3b 0%, #d97706 22%, #f2b705 43%, #2f8f4e 62%, #2563eb 82%, #7c3aed 100%);
+      background-size: 160% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-weight: 900;
+    }
+
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .preview-actions {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      margin-left: auto;
+      margin-right: auto;
+      margin-top: 14px;
+    }
+
+    .resample-btn {
+      min-height: 46px;
+      padding: 0 24px;
+      border-color: #c45f04;
+      background: var(--orange);
+      color: #fff;
+      font-size: 0.96rem;
+      box-shadow: 0 10px 24px rgba(217, 119, 6, 0.24);
+    }
+
+    .resample-btn:hover {
+      border-color: #9a4a03;
+      background: #b95f04;
+      box-shadow: 0 14px 30px rgba(217, 119, 6, 0.32);
+      transform: translateY(-2px);
+    }
+
+    .preview-page-label {
+      min-width: 58px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      text-align: center;
+    }
+
+    .preview-tile {
+      display: block;
+      min-width: 0;
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--paper);
+      color: var(--ink);
+      text-align: left;
+      cursor: pointer;
+      transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+    }
+
+    .preview-tile:hover {
+      border-color: var(--line-strong);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 34px rgba(23, 33, 43, 0.12);
+    }
+
+    .preview-media,
+    .video-stage {
+      aspect-ratio: 4 / 3;
+      background: #050709;
+      overflow: hidden;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .preview-meta {
+      min-height: 56px;
+      padding: 7px 8px 8px;
+    }
+
+    .preview-meta strong {
+      display: block;
+      overflow: hidden;
+      font-size: clamp(0.64rem, 0.78vw, 0.74rem);
+      line-height: 1.16;
+      text-overflow: clip;
+      white-space: normal;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    .preview-meta span {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: none;
+    }
+
+    .preview-tile.tabletop-ego .preview-meta span,
+    .category-section.tabletop-ego .category-label { color: var(--red); }
+
+    .preview-tile.wholebody-ego .preview-meta span,
+    .category-section.wholebody-ego .category-label { color: var(--blue); }
+
+    .preview-tile.tabletop-external .preview-meta span,
+    .category-section.tabletop-external .category-label { color: var(--orange); }
+
+    .preview-tile.wholebody-external .preview-meta span,
+    .category-section.wholebody-external .category-label { color: var(--green); }
+
+    .section-head {
+      margin: 30px 0 16px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(1.45rem, 3vw, 2.3rem);
+      line-height: 1.05;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .category-stack {
+      display: grid;
+      gap: 34px;
+    }
+
+    .category-section {
+      scroll-margin-top: 20px;
+      border-top: 1px solid var(--line);
+      padding-top: 24px;
+    }
+
+    .category-bar {
+      display: grid;
+      grid-template-columns: minmax(260px, 420px) minmax(0, 1fr);
+      gap: 18px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .category-label {
+      margin: 0;
+      font-size: clamp(1.2rem, 2.2vw, 1.85rem);
+      font-weight: 850;
+      letter-spacing: 0;
+    }
+
+    .task-title {
+      margin: 0;
+      overflow: hidden;
+      color: #394653;
+      font-size: clamp(0.82rem, 1.18vw, 1rem);
+      line-height: 1.25;
+      text-align: center;
+    }
+
+    .category-bar .task-title {
+      text-align: left;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .task-title.below {
+      width: min(920px, 100%);
+      margin: 12px auto 0;
+      text-overflow: clip;
+      white-space: normal;
+    }
+
+    .task-title-row {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .task-title-row.ego {
+      grid-template-columns: 1fr;
+    }
+
+    .task-title-row.external {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .task-title-row .task-title {
+      margin: 0;
+      white-space: nowrap;
+      font-size: clamp(0.72rem, 0.95vw, 0.9rem);
+    }
+
+    .compare-shell {
+      position: relative;
+    }
+
+    .compare-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .compare-grid.ego {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      align-items: stretch;
+      gap: 12px;
+    }
+
+    .compare-grid.external {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      position: relative;
+    }
+
+    .compare-grid.external::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 32px;
+      left: 50%;
+      border-left: 1px dashed var(--line-strong);
+      transform: translateX(-0.5px);
+      pointer-events: none;
+    }
+
+    .video-cell {
+      min-width: 0;
+      margin: 0;
+    }
+
+    .video-stage {
+      position: relative;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .compare-video,
+    .compare-clip {
+      position: absolute;
+      inset: 0;
+    }
+
+    .compare-clip {
+      clip-path: inset(0 50% 0 0);
+      will-change: clip-path;
+    }
+
+    .compare-handle {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      margin-left: -1px;
+      background: rgba(255, 255, 255, 1);
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.35), 0 0 18px rgba(255,255,255,0.65);
+      pointer-events: none;
+      will-change: left;
+    }
+
+    .compare-label,
+    .plain-label {
+      position: absolute;
+      top: 9px;
+      z-index: 2;
+      padding: 5px 8px;
+      border-radius: 5px;
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      background: rgba(0, 0, 0, 0.08);
+      color: rgba(255, 255, 255, 0.62);
+      font-size: 0.72rem;
+      font-weight: 850;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      pointer-events: none;
+      transition: background 140ms ease, color 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+    }
+
+    .compare-label.left { left: 9px; }
+    .compare-label.right { right: 9px; }
+    .plain-label { left: 9px; color: #fff; }
+    .plain-label.generated { background: rgba(28, 80, 145, 0.92); }
+    .plain-label.ground-truth { background: rgba(18, 108, 77, 0.92); }
+
+    .compare-grid.ego .video-cell:nth-child(-n+3) .video-stage {
+      border-color: rgba(28, 80, 145, 0.28);
+      box-shadow: 0 10px 24px rgba(28, 80, 145, 0.10);
+    }
+
+    .compare-grid.ego .video-cell:nth-child(n+4) .video-stage {
+      border-color: rgba(18, 108, 77, 0.28);
+      box-shadow: 0 10px 24px rgba(18, 108, 77, 0.10);
+    }
+
+    .compare-label.left.active {
+      border-color: rgba(215, 255, 232, 0.95);
+      background: rgba(18, 108, 77, 0.92);
+      color: #fff;
+      box-shadow: 0 0 0 1px rgba(215, 255, 232, 0.45);
+    }
+
+    .compare-label.right.active {
+      border-color: rgba(217, 235, 255, 0.95);
+      background: rgba(28, 80, 145, 0.92);
+      color: #fff;
+      box-shadow: 0 0 0 1px rgba(217, 235, 255, 0.45);
+    }
+
+    figcaption {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 400;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .icon-btn {
+      position: absolute;
+      top: 50%;
+      z-index: 5;
+      width: 54px;
+      height: 54px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.94);
+      color: var(--ink);
+      cursor: pointer;
+      box-shadow: 0 12px 30px rgba(23, 33, 43, 0.18);
+      transform: translateY(-50%);
+      transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+    }
+
+    .icon-btn:hover {
+      border-color: var(--line-strong);
+      background: #fff;
+      transform: translateY(-50%) scale(1.04);
+    }
+
+    .icon-btn.prev { left: -26px; }
+    .icon-btn.next { right: -26px; }
+
+    @media (max-width: 1050px) {
+      .preview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .compare-grid.external { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .compare-grid.external::after { display: none; }
+      .category-bar { grid-template-columns: 1fr; }
+      .icon-btn.prev { left: 8px; }
+      .icon-btn.next { right: 8px; }
+    }
+
+    @media (max-width: 640px) {
+      .shell { width: min(100% - 24px, var(--content-width)); padding-top: 20px; }
+      .preview-grid,
+      .compare-grid.external { grid-template-columns: 1fr; }
+      .compare-grid.ego { grid-template-columns: 1fr; }
+      .task-title { white-space: normal; }
+      .topbar { justify-content: center; }
+      .resource-pill { min-width: 0; flex: 1 1 112px; }
+      h1,
+      .eyebrow { display: block; }
+      .eyebrow { margin: 10px 0 0; }
+      .title-line { white-space: normal; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="topbar">
+      <nav class="lang-switch" aria-label="Language">
+        <button class="lang-option" id="lang-en" type="button">🌎 English</button>
+        <span class="lang-separator">|</span>
+        <button class="lang-option" id="lang-zh" type="button">🇨🇳 中文</button>
+      </nav>
+    </div>
+
+    <section class="hero">
+      <div class="title-line">
+        <h1>UnifoLM-EWPred-1</h1>
+        <p class="eyebrow" data-i18n="eyebrow">Embodied World Prediction Model for General Humanoid Intelligence</p>
+      </div>
+      <div class="resource-links" aria-label="Resources">
+        <span class="resource-pill" data-resource="model" aria-disabled="true">
+          <span class="resource-icon">🌎</span>
+          <span data-i18n-html="modelLink">Model</span>
+        </span>
+        <span class="resource-pill" data-resource="code" aria-disabled="true">
+          <span class="resource-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="img">
+              <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.1 3.29 9.41 7.86 10.94.58.1.79-.25.79-.56v-2.1c-3.2.7-3.88-1.36-3.88-1.36-.52-1.34-1.28-1.7-1.28-1.7-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.2 1.77 1.2 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.23-1.28-5.23-5.68 0-1.25.45-2.28 1.19-3.08-.12-.29-.52-1.46.11-3.04 0 0 .97-.31 3.17 1.18A10.9 10.9 0 0 1 12 6.13c.98 0 1.96.13 2.88.39 2.2-1.49 3.17-1.18 3.17-1.18.63 1.58.23 2.75.11 3.04.74.8 1.18 1.83 1.18 3.08 0 4.41-2.69 5.38-5.25 5.67.42.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"/>
+            </svg>
+          </span>
+          <span data-i18n-html="codeLink">Code</span>
+        </span>
+      </div>
+      <p class="intro" data-i18n-html="intro"></p>
+    </section>
+
+    <section class="page-section">
+      <div class="preview-grid" id="preview-grid"></div>
+      <div class="preview-actions">
+        <button class="resample-btn" id="preview-prev" type="button" data-i18n="prevPage">Previous</button>
+        <span class="preview-page-label" id="preview-page-label">1 / 3</span>
+        <button class="resample-btn" id="preview-next" type="button" data-i18n="nextPage">Next</button>
+      </div>
+    </section>
+
+    <section>
+      <p class="section-intro ecosystem-note" data-i18n-html="ecosystemNote"></p>
+      <div class="section-head">
+        <h2 data-i18n="examplesTitle">Model Prediction Output Examples</h2>
+      </div>
+      <div class="category-stack" id="category-stack"></div>
+    </section>
+  </main>
+
+  <script src="manifest.js?v=20260814-wbtext1"></script>
+  <script>
+    const data = window.WORLD_PRED_DATA;
+    const state = new Map(data.categories.map(category => [category.key, 0]));
+    const previewPageSize = 8;
+    const featuredPool = data.featured && data.featured.length ? data.featured : (data.preview || data.previewPool || []);
+    const previewPageCount = Math.max(1, Math.ceil(featuredPool.length / previewPageSize));
+    let lang = "en";
+    let previewPage = 0;
+
+    const i18n = {
+      en: {
+        eyebrow: "Embodied World Prediction Model for General Humanoid Intelligence",
+        examplesTitle: "Model Prediction vs Real Video",
+        prevPage: "Previous",
+        nextPage: "Next",
+        modelLink: "Model <small>(Coming Soon)</small>",
+        datasetsLink: "Datasets <small>(Coming Soon)</small>",
+        codeLink: "Code <small>(Coming Soon)</small>",
+        intro: "<strong>UnifoLM-EWPred-1</strong> is the latest open-source world model in the UnifoLM series for general-purpose humanoid embodied manipulation. To our knowledge, this is the first world prediction model built specifically for the Unitree G1, covering both tabletop and whole-body manipulation while supporting multiple end effectors, tasks, scenes, and viewpoints. <strong>UnifoLM-EWPred-1</strong> predicts how objects move during robot interactions such as grasping and pushing, while also modeling environment dynamics caused by whole-body motion, enabling multi-view understanding of the physical laws that govern robot-world interaction. It provides a world-model foundation for long-horizon robot planning, policy learning, and simulation data generation. Prediction results are shown below.",
+        ecosystemNote: "<strong>UnifoLM-EWPred-1</strong> <span class=\"rainbow-emphasis\">has only 2B parameters, and post-training can be performed on a single RTX 4090 with 48GB VRAM</span>, substantially lowering the research and development barrier for embodied world models. We hope more students, developers, and researchers will join this open-source ecosystem to explore world-model-driven embodied intelligence, advance continuous innovation in algorithms, data, and applications, and accelerate the iteration of core technologies for general-purpose humanoid robots. More comparisons between model predictions and real videos are shown below.",
+        generated: "Prediction",
+        groundTruth: "Ground Truth",
+        views: {
+          left_wrist: "Left Wrist",
+          main: "Main Camera",
+          right_wrist: "Right Wrist"
+        },
+        category: {
+          tabletop_ego: "Ego: Table-top Manipulation",
+          wholebody_ego: "Ego: Whole-Body Manipulation",
+          tabletop_external: "External: Table-top Manipulation",
+          wholebody_external: "External: Whole-Body Manipulation"
+        },
+        taskLabels: {
+          adjust_sickbed: "Adjust the hospital bed height",
+          adjust_sickbed_brainco: "Adjust the hospital bed height",
+          clean_living_room_inspire: "Wipe down the coffee table",
+          clothes_washing: "Put dirty clothes into the washing machine",
+          clear_plates: "Place plates on the rack in red-green-blue order",
+          color_arrangement: "Arrange blocks right to left in red-green-yellow order",
+          cosmos_wbt_make_bed: "Make the bed and smooth the bedding",
+          cosmos_wbt_open_drawer_take_medicine: "Open the drawer and take out the medicine",
+          cosmos_wbt_pick_clothes: "Put the clothes on the bed into the laundry basket",
+          cosmos_wbt_place_grapes_in_fruit_basket: "Move grapes from the crate to the shelf",
+          cosmos_wbt_push_wheelchair_to_bedside: "Push the wheelchair to the bedside",
+          cosmos_wbt_put_beverage_into_refrigerator_drawer: "Put the beverage into the middle refrigerator drawer",
+          cosmos_wbt_put_cabbages_into_shopping_basket: "Put cabbages from the shelf into the shopping basket",
+          data_make_the_bed_brainco: "Make the bed and smooth the bedding",
+          data_make_the_bed_brainco_alt: "Make the bed and smooth the bedding",
+          "data_make_the_bed-brainco": "Make the bed and smooth the bedding",
+          "data_pick_clothes-inspire": "Put the clothes on the bed into the laundry basket",
+          data_pick_clothes_inspire: "Put the clothes on the bed into the laundry basket",
+          "data_pick_up_cushion-brainco": "Pick up the pillow and place it on the chair",
+          data_pick_up_cushion_brainco: "Pick up the pillow and place it on the chair",
+          data_put_clothes_into_washing_machine: "Put the clothes from the basket into the washing machine",
+          "data_take_plate_into_dishwasher-brainco": "Put the plate from the sink into the dishwasher",
+          data_take_plate_into_dishwasher_brainco: "Put the plate from the sink into the dishwasher",
+          disconnect_ethernet: "Unplug the Ethernet cable from the port",
+          fold_towel: "Fold the towel and set it aside",
+          fruit_basket_collection: "Collect all fruits into the fruit basket",
+          hang_keys_on_a_hook: "Remove the keys from the hook",
+          hang_the_cup: "Hang the cup",
+          kitchen_organization: "Organize the kitchen",
+          livingroom_place_fruits: "Pick up the fruit and place it on the plate",
+          make_bed_brainco_2: "Make the bed and smooth the bedding",
+          make_bed: "Make the bed and smooth the bedding",
+          move_the_pillow_to_the_sofa_from_floor: "Move the pillow from the floor to the sofa",
+          open_pill_bottle: "Unscrew the cap and pour medicine into the box",
+          open_the_third_drawer_take_out_the_medicine_and_close_it: "Open the third drawer, take out the medicine, and close it",
+          organize_bookshelf: "Place the top book onto the bookshelf",
+          organize_stationery: "Put stationery into the pencil case",
+          organize_test_cube: "Arrange the test tubes back into the rack",
+          organize_tools: "Pick up tools right to left and hang them on the tool rack",
+          pack_bag: "Put the pencil case into the backpack and zip it up",
+          pack_iphone: "Put the phone into the package box",
+          pack_the_doll: "Put the plush toys on the table into the bag",
+          paper_cup_stacking: "Stack paper cups with two on the base and one on top",
+          pick_out_battery: "Pick out the batteries and put them into the green box",
+          pick_clothes: "Pick up the clothes",
+          pick_up_clothes_brainco: "Put the clothes on the bed into the laundry basket",
+          pick_up_drinks_brainco: "Put the drinks and snacks into the shopping basket",
+          pick_up_drinks_inspire: "Put the drinks and snacks into the shopping basket",
+          pick_up_fruit_brainco: "Pick up the fruit and place it on the plate",
+          picking_trash_to_rubbish_bin: "Put the trash into the rubbish bin",
+          place_photo_frames: "Open the photo frame and place it on the table",
+          place_the_purple_and_green_grapes_in_the_fruit_basket_be: "Place the purple and green grapes in the fruit basket",
+          plug_charger: "Straighten the power strip and plug in the charger",
+          plug_in_ethernet: "Plug the Ethernet cable into the port",
+          push_the_wheelchair_to_the_bedside: "Push the wheelchair to the bedside",
+          put_the_beverage_from_the_stove_into_the_refrigerator_dr: "Put the beverage from the stove into the refrigerator drawer",
+          put_the_cabbages_on_the_shelf_into_the_shopping_basket: "Put the cabbages from the shelf into the shopping basket",
+          remove_pinned_note: "Remove the note and put the pins into the box",
+          setting_the_table: "Set the table",
+          spell_unitree: "Arrange letter blocks to spell robot",
+          sort_food_conveyor: "Sort conveyor-belt food onto the right shelf",
+          sort_fruit: "Place fruits onto matching color plates",
+          stack_bowls_three: "Stack three bowls in red-green-blue order",
+          stack_cups: "Place the cups neatly onto the cup rack",
+          store_earphones: "Put the earphones into the case and store them",
+          store_racket: "Put the paddle into the case and zip it up",
+          supermarket_shopping: "Put snacks from the shelf into the shopping basket",
+          sweep_floor: "Sweep the floor",
+          toolbox_storage: "Put all tools into the toolbox and lock it",
+          unlock: "Unlock with the key",
+          washing_machine: "Use the washing machine",
+          zip_up: "Zip up"
+        }
+      },
+      zh: {
+        eyebrow: "面向通用人形智能的具身世界预测模型",
+        examplesTitle: "模型预测 vs 真实视频",
+        prevPage: "上一页",
+        nextPage: "下一页",
+        modelLink: "模型 <small>(Coming Soon)</small>",
+        datasetsLink: "数据集 <small>(Coming Soon)</small>",
+        codeLink: "代码 <small>(Coming Soon)</small>",
+        intro: "<strong>UnifoLM-EWPred-1</strong> 是 UnifoLM 系列最新开源的面向通用人形机器人具身操作的世界模型，也是全球首个基于<strong>宇树 G1</strong> 打造，覆盖<strong>桌面操作</strong>与<strong>全身操作</strong>，支持多末端执行器、多任务、多场景、多视角的世界预测模型。<strong>UnifoLM-EWPred-1</strong> 不仅能够建模抓取、推动等操作中的物体运动，还能够学习全身运动带来的环境动态变化，多角度理解机器人与真实世界交互的物理规律，为机器人长时序规划、策略学习和仿真数据生成提供世界模型基础。预测效果如下所示：",
+        ecosystemNote: "<strong>UnifoLM-EWPred-1</strong> <span class=\"rainbow-emphasis\">参数量仅 2B，单卡 RTX 4090（48GB 显存）即可实现后训练</span>，大幅降低了具身世界模型的研发门槛。我们希望更多学生、开发者和研究人员能够参与到这一开源生态中，共同探索世界建模驱动的具身智能技术，推动算法、数据与应用的持续创新，加速通用人形机器人核心技术迭代。更多模型预测结果与真实视频对比如下：",
+        generated: "预测",
+        groundTruth: "真值",
+        views: {
+          left_wrist: "左腕视角",
+          main: "主视角",
+          right_wrist: "右腕视角"
+        },
+        category: {
+          tabletop_ego: "第一视角：桌面操作",
+          wholebody_ego: "第一视角：全身操作",
+          tabletop_external: "第三视角：桌面操作",
+          wholebody_external: "第三视角：全身操作"
+        },
+        taskLabels: {
+          adjust_sickbed: "调节病床高度",
+          adjust_sickbed_brainco: "调节病床高度",
+          clean_living_room_inspire: "用抹布擦拭茶几桌面",
+          clothes_washing: "将脏衣物放入洗衣机清洗",
+          clear_plates: "把盘子收纳到碗架按红绿蓝顺序摆好",
+          color_arrangement: "把积木按红绿黄顺序从右往左摆好",
+          cosmos_wbt_make_bed: "整理床铺并铺平被褥",
+          cosmos_wbt_open_drawer_take_medicine: "打开抽屉取出药品",
+          cosmos_wbt_pick_clothes: "把床上的衣服收纳进洗衣篮",
+          cosmos_wbt_place_grapes_in_fruit_basket: "将葡萄从木箱拿起放入货架",
+          cosmos_wbt_push_wheelchair_to_bedside: "将轮椅推至床边",
+          cosmos_wbt_put_beverage_into_refrigerator_drawer: "拿起饮料放入冰箱中间抽屉",
+          cosmos_wbt_put_cabbages_into_shopping_basket: "将货架上的白菜放入购物篮",
+          "data_make_the_bed-brainco": "整理床铺并铺平被褥",
+          data_make_the_bed_brainco: "整理床铺并铺平被褥",
+          "data_pick_clothes-inspire": "把床上的衣服收纳进洗衣篮",
+          data_pick_clothes_inspire: "把床上的衣服收纳进洗衣篮",
+          "data_pick_up_cushion-brainco": "捡起地上的枕头放到椅子上",
+          data_pick_up_cushion_brainco: "捡起地上的枕头放到椅子上",
+          data_put_clothes_into_washing_machine: "把篮子里的衣服放入洗衣机",
+          "data_take_plate_into_dishwasher-brainco": "将水槽里的餐盘放入洗碗机",
+          data_take_plate_into_dishwasher_brainco: "将水槽里的餐盘放入洗碗机",
+          disconnect_ethernet: "把网线从网口拔出来",
+          fold_towel: "将毛巾叠整齐并放到一旁",
+          fruit_basket_collection: "把所有水果收进果篮里",
+          hang_keys_on_a_hook: "将钥匙从挂钩上取下来",
+          hang_the_cup: "挂起杯子",
+          kitchen_organization: "整理厨房",
+          livingroom_place_fruits: "拿起水果放到盘子里",
+          make_bed_brainco_2: "整理床铺并铺平被褥",
+          make_bed: "整理床铺并铺平被褥",
+          move_the_pillow_to_the_sofa_from_floor: "将地上的枕头移到沙发上",
+          open_pill_bottle: "拧开瓶盖把药倒进盒子",
+          open_the_third_drawer_take_out_the_medicine_and_close_it: "打开第三个抽屉，取出药品后关上",
+          organize_bookshelf: "将最上面的书放到书架上",
+          organize_stationery: "把文具装进文具盒里",
+          organize_test_cube: "把试管整齐地摆回试管架",
+          organize_tools: "将工具从右到左依次拿起挂到工具架",
+          pack_bag: "把文具盒放进书包并拉上拉链",
+          pack_iphone: "将手机装入包装盒",
+          pack_the_doll: "将桌上的毛绒玩具装进袋子",
+          paper_cup_stacking: "将纸杯堆叠为底层两个、顶层一个",
+          pick_out_battery: "把电池挑出并放入绿盒",
+          pick_clothes: "拾取衣物",
+          pick_up_clothes_brainco: "把床上的衣服收纳进洗衣篮",
+          pick_up_drinks_brainco: "拾取饮料和零食到购物篮",
+          pick_up_drinks_inspire: "拾取饮料和零食到购物篮",
+          pick_up_fruit_brainco: "拿起水果放到盘子里",
+          picking_trash_to_rubbish_bin: "将垃圾放入垃圾桶",
+          place_photo_frames: "把相框展开并将其摆放到桌子上",
+          place_the_purple_and_green_grapes_in_the_fruit_basket_be: "将紫色和绿色葡萄放入果篮",
+          plug_charger: "摆正插线板并插入插头",
+          plug_in_ethernet: "把网线插入网口",
+          push_the_wheelchair_to_the_bedside: "将轮椅推到床边",
+          put_the_beverage_from_the_stove_into_the_refrigerator_dr: "将灶台上的饮料放入冰箱抽屉",
+          put_the_cabbages_on_the_shelf_into_the_shopping_basket: "将货架上的卷心菜放入购物篮",
+          remove_pinned_note: "取下便签并把图钉放入盒子",
+          setting_the_table: "摆放餐具",
+          spell_unitree: "摆放字母方块拼出 robot",
+          sort_food_conveyor: "将传送带食物分类放到右侧架子",
+          sort_fruit: "把水果放进颜色对应的盘子里",
+          stack_bowls_three: "将三个碗按红色、绿色、蓝色的顺序叠放",
+          stack_cups: "把杯子整理好放到杯架",
+          store_earphones: "把耳机装入耳机盒并收纳起来",
+          store_racket: "将乒乓球拍放入球拍套并拉上拉链",
+          supermarket_shopping: "从货架上拿零食到购物篮",
+          sweep_floor: "扫地",
+          toolbox_storage: "将桌面上所有工具收纳进工具箱，并锁上箱子",
+          unlock: "用钥匙把锁打开",
+          washing_machine: "使用洗衣机",
+          zip_up: "拉上拉链"
+        }
+      }
+    };
+
+    function t(key) {
+      return i18n[lang][key];
+    }
+
+    function getPreviewSrc(entry) {
+      return entry.views.main.gen;
+    }
+
+    function categoryLabel(entryOrCategory) {
+      return i18n[lang].category[entryOrCategory.category || entryOrCategory.key] || entryOrCategory.categoryLabel || entryOrCategory.label;
+    }
+
+    function taskTitle(task) {
+      return i18n[lang].taskLabels[task.task] || task.title;
+    }
+
+    function shuffle(items) {
+      const output = [...items];
+      for (let i = output.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [output[i], output[j]] = [output[j], output[i]];
+      }
+      return output;
+    }
+
+    function randomSample(items, count, blockedIds = new Set()) {
+      return shuffle(items.filter(item => !blockedIds.has(item.id))).slice(0, count);
+    }
+
+    function balancedPreviewSample(items, count, blockedIds = new Set()) {
+      const selected = [];
+      const selectedIds = new Set();
+      data.categories.forEach(category => {
+        const candidates = items.filter(item => item.category === category.key && !blockedIds.has(item.id));
+        const pick = randomSample(candidates, 1)[0];
+        if (pick && !selectedIds.has(pick.id)) {
+          selected.push(pick);
+          selectedIds.add(pick.id);
+        }
+      });
+      const blocked = new Set([...blockedIds, ...selectedIds]);
+      const rest = randomSample(items, count - selected.length, blocked);
+      return shuffle([...selected, ...rest]).slice(0, count);
+    }
+
+    function changePreviewPage(dir) {
+      previewPage = (previewPage + dir + previewPageCount) % previewPageCount;
+      renderPreview();
+    }
+
+    function applyLanguage() {
+      document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
+      document.querySelectorAll("[data-i18n]").forEach(node => {
+        node.textContent = t(node.dataset.i18n);
+      });
+      document.querySelectorAll("[data-i18n-html]").forEach(node => {
+        node.innerHTML = t(node.dataset.i18nHtml);
+      });
+      document.getElementById("lang-en").classList.toggle("active", lang === "en");
+      document.getElementById("lang-zh").classList.toggle("active", lang === "zh");
+    }
+
+    function renderPreview() {
+      const grid = document.getElementById("preview-grid");
+      grid.innerHTML = "";
+      const start = previewPage * previewPageSize;
+      const previewItems = featuredPool.slice(start, start + previewPageSize);
+      previewItems.forEach(entry => {
+        const button = document.createElement("button");
+        button.className = `preview-tile ${entry.category.replaceAll("_", "-")}`;
+        button.type = "button";
+        button.innerHTML = `
+          <div class="preview-media">
+            <video src="${getPreviewSrc(entry)}" muted autoplay loop playsinline preload="metadata"></video>
+          </div>
+          <div class="preview-meta">
+            <strong>${taskTitle(entry)}</strong>
+            <span>${categoryLabel(entry)}</span>
+          </div>
+        `;
+        button.addEventListener("click", () => {
+          const category = data.categories.find(item => item.key === entry.category);
+          if (!category) return;
+          const isEgo = category.key.endsWith("_ego");
+          let index;
+          if (isEgo) {
+            index = category.tasks.findIndex(item => item.id === entry.id);
+            if (index < 0) index = category.tasks.findIndex(item => item.task === entry.task);
+          } else {
+            const pairs = externalPairs(category);
+            index = pairs.findIndex(pair => pair.some(item => item.id === entry.id));
+            if (index < 0) index = pairs.findIndex(pair => pair.some(item => item.task === entry.task));
+          }
+          if (index >= 0) {
+            state.set(category.key, index);
+            renderCategory(category);
+          }
+          document.getElementById(`section-${category.key}`).scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+        grid.appendChild(button);
+      });
+      document.getElementById("preview-page-label").textContent = `${previewPage + 1} / ${previewPageCount}`;
+    }
+
+    function setComparePosition(stage, pct) {
+      const p = Math.max(0, Math.min(100, pct));
+      const clip = stage.querySelector(".compare-clip");
+      const handle = stage.querySelector(".compare-handle");
+      const leftLabel = stage.querySelector(".compare-label.left");
+      const rightLabel = stage.querySelector(".compare-label.right");
+      if (!clip || !handle || !leftLabel || !rightLabel) return;
+      clip.style.clipPath = `inset(0 ${100 - p}% 0 0)`;
+      handle.style.left = `${p}%`;
+      leftLabel.classList.toggle("active", p >= 42);
+      rightLabel.classList.toggle("active", p <= 58);
+    }
+
+    function setGridComparePosition(grid, pct) {
+      grid.querySelectorAll(".video-stage.compare").forEach(stage => setComparePosition(stage, pct));
+    }
+
+    function syncGridVideos(grid) {
+      const videos = Array.from(grid.querySelectorAll("video"));
+      const master = videos[0];
+      if (!master) return;
+
+      const syncVideos = (force = false) => {
+        if (!master.duration || master.readyState < 2) return;
+        videos.slice(1).forEach(video => {
+          if (!video.duration || video.readyState < 1) return;
+          const drift = Math.abs(video.currentTime - master.currentTime);
+          if (force || drift > 0.75) {
+            try { video.currentTime = master.currentTime; } catch (_) {}
+          }
+          if (video.paused) video.play().catch(() => {});
+        });
+      };
+
+      master.addEventListener("play", () => syncVideos(true));
+      master.addEventListener("seeked", () => syncVideos(true));
+      master.addEventListener("loadedmetadata", () => syncVideos(true));
+      master.addEventListener("timeupdate", () => {
+        if (master.currentTime < 0.2) syncVideos(true);
+      });
+      const intervalId = setInterval(() => {
+        if (!master.paused) syncVideos(false);
+      }, 1200);
+      return () => clearInterval(intervalId);
+    }
+
+    function compareCell(view, pair) {
+      return `
+        <figure class="video-cell">
+          <div class="video-stage compare">
+            <video class="compare-video" src="${pair.gen}" muted autoplay loop playsinline preload="metadata"></video>
+            <div class="compare-clip">
+              <video class="compare-video" src="${pair.gt}" muted autoplay loop playsinline preload="metadata"></video>
+            </div>
+            <div class="compare-handle" aria-hidden="true"></div>
+            <span class="compare-label left">${t("groundTruth")}</span>
+            <span class="compare-label right">${t("generated")}</span>
+          </div>
+          <figcaption>${i18n[lang].views[view] || view}</figcaption>
+        </figure>
+      `;
+    }
+
+    function plainVideoCell(task, kind) {
+      const label = kind === "gen" ? t("generated") : t("groundTruth");
+      const labelClass = kind === "gen" ? "generated" : "ground-truth";
+      return `
+        <figure class="video-cell">
+          <div class="video-stage plain">
+            <video src="${task.views.main[kind]}" muted autoplay loop playsinline preload="metadata"></video>
+            <span class="plain-label ${labelClass}">${label}</span>
+          </div>
+        </figure>
+      `;
+    }
+
+    function egoVideoCell(task, view, kind) {
+      const label = kind === "gen" ? t("generated") : t("groundTruth");
+      const labelClass = kind === "gen" ? "generated" : "ground-truth";
+      return `
+        <figure class="video-cell">
+          <div class="video-stage plain">
+            <video src="${task.views[view][kind]}" muted autoplay loop playsinline preload="metadata"></video>
+            <span class="plain-label ${labelClass}">${label}</span>
+          </div>
+          <figcaption>${i18n[lang].views[view] || view}</figcaption>
+        </figure>
+      `;
+    }
+
+    function egoCells(task) {
+      const views = ["left_wrist", "main", "right_wrist"].filter(view => task.views[view]);
+      const generatedRow = views.map(view => egoVideoCell(task, view, "gen")).join("");
+      const groundTruthRow = views.map(view => egoVideoCell(task, view, "gt")).join("");
+      return generatedRow + groundTruthRow;
+    }
+
+    function taskSummary(tasks) {
+      if (tasks.length === 1) return taskTitle(tasks[0]);
+      const titles = Array.from(new Set(tasks.map(task => taskTitle(task))));
+      return titles.join(" / ");
+    }
+
+    function externalPairs(category) {
+      const byTask = new Map();
+      category.tasks.forEach(entry => {
+        if (!byTask.has(entry.task)) byTask.set(entry.task, []);
+        byTask.get(entry.task).push(entry);
+      });
+      const pairs = [];
+      const singletons = [];
+      byTask.forEach(entries => {
+        if (entries.length >= 2) {
+          pairs.push(pickDiversePair(entries));
+        } else {
+          singletons.push(entries[0]);
+        }
+      });
+      return pairs.concat(differentTaskPairs(singletons));
+    }
+
+    function differentTaskPairs(tasks) {
+      const firstByTask = [];
+      const seen = new Set();
+      tasks.forEach(entry => {
+        if (!seen.has(entry.task)) {
+          firstByTask.push(entry);
+          seen.add(entry.task);
+        }
+      });
+      const pairs = [];
+      for (let i = 0; i < firstByTask.length; i += 2) {
+        const first = firstByTask[i];
+        const second = firstByTask[i + 1] || firstByTask[0];
+        if (first && second && first.task !== second.task) pairs.push([first, second]);
+      }
+      return pairs;
+    }
+
+    function externalViewTag(entry) {
+      const match = entry.episode.match(/^\d{8}_([^_]+)__episode_/);
+      return match ? match[1] : entry.episode;
+    }
+
+    function pickDiversePair(entries) {
+      const first = entries[0];
+      const firstTag = externalViewTag(first);
+      const second = entries.find(entry => externalViewTag(entry) !== firstTag) || entries[1];
+      return [first, second];
+    }
+
+    function buildCategorySection(category) {
+      const index = state.get(category.key) || 0;
+      const firstTask = category.tasks[index] || category.tasks[0];
+      const isEgo = category.key.endsWith("_ego");
+      const pairs = isEgo ? [] : externalPairs(category);
+      const pairIndex = pairs.length ? index % pairs.length : 0;
+      const displayTasks = isEgo
+        ? [firstTask]
+        : (pairs[pairIndex] || []);
+      const cells = isEgo
+        ? egoCells(firstTask)
+        : displayTasks.map(task => `${plainVideoCell(task, "gen")}${plainVideoCell(task, "gt")}`).join("");
+      const categoryTitle = lang === "zh" ? `<h3 class="task-title">${taskSummary(displayTasks)}</h3>` : "";
+      const titleRow = lang === "zh" ? "" : (isEgo
+        ? `<div class="task-title-row ego"><h3 class="task-title">${taskTitle(firstTask)}</h3></div>`
+        : `<div class="task-title-row external">${displayTasks.map(task => `<h3 class="task-title">${taskTitle(task)}</h3>`).join("")}</div>`);
+      const section = document.createElement("section");
+      section.className = `category-section ${category.key.replaceAll("_", "-")}`;
+      section.id = `section-${category.key}`;
+      section.innerHTML = `
+        <div class="category-bar">
+          <p class="category-label">${categoryLabel(category)}</p>
+          ${categoryTitle}
+        </div>
+        <div class="compare-shell">
+          <button class="icon-btn prev" type="button" aria-label="Previous task" data-dir="-1">&#9664;</button>
+          <div class="compare-grid ${isEgo ? "ego" : "external"}">${cells}</div>
+          <button class="icon-btn next" type="button" aria-label="Next task" data-dir="1">&#9654;</button>
+        </div>
+        ${titleRow}
+      `;
+      section.querySelectorAll(".icon-btn").forEach(button => {
+        button.addEventListener("click", () => {
+          const dir = Number(button.dataset.dir);
+          const total = isEgo ? category.tasks.length : pairs.length;
+          const next = total ? (index + dir + total) % total : 0;
+          state.set(category.key, next);
+          renderCategory(category);
+        });
+      });
+      const egoGrid = section.querySelector(".compare-grid.ego");
+      if (egoGrid) section.cleanup = syncGridVideos(egoGrid);
+      return section;
+    }
+
+    function renderCategory(category) {
+      const nextSection = buildCategorySection(category);
+      const oldSection = document.getElementById(`section-${category.key}`);
+      if (oldSection) {
+        oldSection.cleanup?.();
+        oldSection.replaceWith(nextSection);
+      } else {
+        document.getElementById("category-stack").appendChild(nextSection);
+      }
+    }
+
+    function renderCategories() {
+      const stack = document.getElementById("category-stack");
+      stack.querySelectorAll("section").forEach(section => section.cleanup?.());
+      stack.innerHTML = "";
+      data.categories.forEach(renderCategory);
+    }
+
+    document.getElementById("lang-en").addEventListener("click", () => {
+      lang = "en";
+      applyLanguage();
+      renderPreview();
+      renderCategories();
+    });
+    document.getElementById("lang-zh").addEventListener("click", () => {
+      lang = "zh";
+      applyLanguage();
+      renderPreview();
+      renderCategories();
+    });
+    document.getElementById("preview-prev").addEventListener("click", () => changePreviewPage(-1));
+    document.getElementById("preview-next").addEventListener("click", () => changePreviewPage(1));
+    applyLanguage();
+    renderPreview();
+    renderCategories();
+  </script>
+</body>
+</html>
