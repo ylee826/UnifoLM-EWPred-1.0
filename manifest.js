@@ -2938,8 +2938,8 @@ window.WORLD_PRED_DATA = {
           "trimStartSeconds": null,
           "views": {
             "main": {
-              "gt": "videos/g1_ar_epwbt_ext__make_bed__episode_000001_model_ema_bf16_startlat0_roundsfull_pred_g4_steps8_seed1_20260812_190659/gt_raw.mp4?v=20260814-wbtext1",
-              "gen": "videos/g1_ar_epwbt_ext__make_bed__episode_000001_model_ema_bf16_startlat0_roundsfull_pred_g4_steps8_seed1_20260812_190659/pred_raw.mp4?v=20260814-wbtext1"
+              "gt": "videos/g1_ar_epwbt_ext__make_bed__episode_000001_model_ema_bf16_startlat0_roundsfull_pred_g4_steps8_seed1_20260812_190659/gt_raw.mp4?v=20261010-wbtext2",
+              "gen": "videos/g1_ar_epwbt_ext__make_bed__episode_000001_model_ema_bf16_startlat0_roundsfull_pred_g4_steps8_seed1_20260812_190659/pred_raw.mp4?v=20261010-wbtext2"
             }
           }
         },
@@ -3052,8 +3052,8 @@ window.WORLD_PRED_DATA = {
           "trimStartSeconds": null,
           "views": {
             "main": {
-              "gt": "videos/g1_ar_epwbt_ext__put_the_cabbages_on_the_shelf_into_the_shopping_basket__episode_000075_model_ema_bf16_startlat0_roundsfull_pred_g4_steps8_seed1_20260812_192345/gt_raw.mp4?v=20260814-wbtext1",
-              "gen": "videos/g1_ar_epwbt_ext__put_the_cabbages_on_the_shelf_into_the_shopping_basket__episode_000075_model_ema_bf16_startlat0_roundsfull_pred_g4_steps8_seed1_20260812_192345/pred_raw.mp4?v=20260814-wbtext1"
+              "gt": "videos/g1_ar_epwbt_ext__put_the_cabbages_on_the_shelf_into_the_shopping_basket__episode_000075_model_ema_bf16_startlat0_roundsfull_pred_g4_steps8_seed1_20260812_192345/gt_raw.mp4?v=20261010-wbtext2",
+              "gen": "videos/g1_ar_epwbt_ext__put_the_cabbages_on_the_shelf_into_the_shopping_basket__episode_000075_model_ema_bf16_startlat0_roundsfull_pred_g4_steps8_seed1_20260812_192345/pred_raw.mp4?v=20261010-wbtext2"
             }
           }
         },
